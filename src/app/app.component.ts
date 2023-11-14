@@ -1,5 +1,6 @@
-import { Component, WritableSignal, computed, signal, effect } from '@angular/core';
+import { Component, WritableSignal, computed, signal, effect, EffectRef } from '@angular/core';
 import { FormControl, UntypedFormControl } from '@angular/forms';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-root',
@@ -9,10 +10,14 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 export class AppComponent {
 
   constructor() {
-    effect(() => {
-      console.log(`Name value : ${this.name.value()}`);
-    });
+
   }
+
+  private nameEffect = effect(() => {
+    console.log(`Name value : ${this.name.value()}`);
+  });
+
+  count = 0;
 
   items = [    { name: 'Product A', price: 10 },    { name: 'Product B', price: 15 },    { name: 'Product C', price: 20 },  ];
 
@@ -29,7 +34,12 @@ export class AppComponent {
   
 
   changeName() {
-    this.name.value.set('updated name');
+    this.name.value.set('updated name' + this.count.toString());
+    this.count++;
+    console.log(this.count);
+    if(this.count == 5) {
+      this.nameEffect.destroy();
+    }
   }
 
   removeItem(item: { name: string; price: number; }) {
