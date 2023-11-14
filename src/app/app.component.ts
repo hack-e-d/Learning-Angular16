@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, WritableSignal, computed, signal, effect } from '@angular/core';
+import { FormControl, UntypedFormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,35 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'LearningAngular16';
+
+  constructor() {
+    effect(() => {
+      console.log(`Name value : ${this.name.value()}`);
+    });
+  }
+
+  items = [    { name: 'Product A', price: 10 },    { name: 'Product B', price: 15 },    { name: 'Product C', price: 20 },  ];
+
+  // Define a signal for the list of items
+  itemList = signal(this.items);
+  
+  // Define a computed value for the total price
+  totalPrice = computed(() => {
+    return this.itemList().reduce((acc, curr) => acc + curr.price, 0);
+  });
+  
+  nameSignal : WritableSignal<string> = signal('test');
+  name : UntypedFormControl = new FormControl(this.nameSignal);
+  
+
+  changeName() {
+    this.name.value.set('updated name');
+  }
+
+  removeItem(item: { name: string; price: number; }) {
+    // Update the itemList signal by removing the selected item
+    this.itemList.set(this.itemList().filter((i) => i !== item));
+    console.log(this.itemList());
+  }
+  
 }
